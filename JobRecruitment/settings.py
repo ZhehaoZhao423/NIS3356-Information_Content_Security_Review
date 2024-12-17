@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-ddt_33p8(2$8#y3f@7p1@df9flgshx0@rfp1hspph8mm8)dyce"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 # ALLOWED_HOSTS = ["sjtuis2024mygo.monster"]
@@ -143,12 +143,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/static/'
+# STATIC_ROOT = '/var/static/' # This is Client version
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+#     os.path.join(BASE_DIR, 'static','plugins'),
+#     os.path.join(BASE_DIR, 'static','js'),
+#     os.path.join(BASE_DIR, 'static','img'),
+# ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    os.path.join(BASE_DIR, 'static','plugins'),
-    os.path.join(BASE_DIR, 'static','js'),
-    os.path.join(BASE_DIR, 'static','img'),
+    # os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, 'static/plugins'),  # 插件目录
+    os.path.join(BASE_DIR, 'static/js'),  # JS 目录
+    os.path.join(BASE_DIR, 'static/img'),  # 图片目录
 ]
 
 MEDIA_URL = '/media/'

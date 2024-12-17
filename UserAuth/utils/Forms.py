@@ -125,13 +125,13 @@ class LoginForm(BootStrapForm, forms.ModelForm):
         encrypted_password_hash = rsa_decrypt_password(encrypted_password)
         # 这里得到的encrypted_password_hash是bytes类型，要将其转成str比较
         str_decoded_encrypted_password_hash = encrypted_password_hash.decode('latin1')
-        # print("str_decoded_encrypted_password_hash: ", str_decoded_encrypted_password_hash)
-        # print("row obj password: ", row_obj.password)
-        # print("str_decoded_encrypted_password_hash == row obj password ? ", str_decoded_encrypted_password_hash == row_obj.password)
-        # print("Type of str_decoded_encrypted_password_hash: ", type(str_decoded_encrypted_password_hash))
-        # print("Type of row_obj.password: ", type(row_obj.password))
-        # print("Length of str_decoded_encrypted_password_hash: ", len(str_decoded_encrypted_password_hash))
-        # print("Length of row_obj.password: ", len(row_obj.password))
+        print("str_decoded_encrypted_password_hash: ", str_decoded_encrypted_password_hash)
+        print("row obj password: ", row_obj.password)
+        print("str_decoded_encrypted_password_hash == row obj password ? ", str_decoded_encrypted_password_hash == row_obj.password)
+        print("Type of str_decoded_encrypted_password_hash: ", type(str_decoded_encrypted_password_hash))
+        print("Type of row_obj.password: ", type(row_obj.password))
+        print("Length of str_decoded_encrypted_password_hash: ", len(str_decoded_encrypted_password_hash))
+        print("Length of row_obj.password: ", len(row_obj.password))
 
         if row_obj and str_decoded_encrypted_password_hash == row_obj.password:
             return ''
