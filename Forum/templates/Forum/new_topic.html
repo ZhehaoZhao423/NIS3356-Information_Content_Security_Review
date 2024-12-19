@@ -45,7 +45,8 @@
 {% endblock %}
 
 {% block js %}
-<script nonce="{{request.csp_nonce}}">
+{#<script nonce="{{request.csp_nonce}}">#}
+<script>
     var simplemde = new SimpleMDE();
 </script>
 {% endblock %}

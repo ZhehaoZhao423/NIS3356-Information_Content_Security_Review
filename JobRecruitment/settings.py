@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'mdeditor',
     'widget_tweaks',
-    'csp',
+    # 'csp',
 
     # My app
     'UserAuth',
@@ -65,7 +65,7 @@ MIDDLEWARE = [
     "UserAuth.middlewares.CheckLoginState.CheckLoginStateMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'ContentReview.middleware.SensitiveWordsMiddleware',
-    'csp.middleware.CSPMiddleware',
+    # 'csp.middleware.CSPMiddleware',
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -152,7 +152,6 @@ STATIC_URL = '/static/'
 # ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
-    # os.path.join(BASE_DIR, "static"),
     os.path.join(BASE_DIR, 'static/plugins'),  # 插件目录
     os.path.join(BASE_DIR, 'static/js'),  # JS 目录
     os.path.join(BASE_DIR, 'static/img'),  # 图片目录
@@ -173,32 +172,32 @@ try:
 except ImportError:  # 捕获导入异常
     pass
 
-CSP_IMG_SRC = ("'self'", "data:", "www.google-analytics.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net","http://mms1.baidu.com",)
-CSP_DEFAULT_SRC =(
-    "'self'",
-    "www.google-analytics.com",
-    "https://cdnjs.cloudflare.com",
-    "https://cdn.jsdelivr.net",
-    #'unsafe-inline',
-    )
-CSP_SCRIPT_SRC =(
-    "'self'",
-    "www.googletagmanager.com",
-    "https://cdn.staticfile.org",
-    #'unsafe-inline',
-    )
-CSP_STYLE_SRC =(
-    "'self'",
-    "https://cdnjs.cloudflare.com",
-    "https://cdn.jsdelivr.net",
-    "'unsafe-inline'",
-)
-CSP_INCLUDE_NONCE_IN = ["script-src"]#,"style-src")
+# CSP_IMG_SRC = ("'self'", "data:", "www.google-analytics.com", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net","http://mms1.baidu.com",)
+# CSP_DEFAULT_SRC =(
+#     "'self'",
+#     "www.google-analytics.com",
+#     "https://cdnjs.cloudflare.com",
+#     "https://cdn.jsdelivr.net",
+#     #'unsafe-inline',
+#     )
+# CSP_SCRIPT_SRC =(
+#     "'self'",
+#     "www.googletagmanager.com",
+#     "https://cdn.staticfile.org",
+#     #'unsafe-inline',
+#     )
+# CSP_STYLE_SRC =(
+#     "'self'",
+#     "https://cdnjs.cloudflare.com",
+#     "https://cdn.jsdelivr.net",
+#     "'unsafe-inline'",
+# )
+# CSP_INCLUDE_NONCE_IN = ["script-src"]#,"style-src")
 
 EMAIL_HOST = "smtp.sjtu.edu.cn"
 EMAIL_PORT = 25
-EMAIL_HOST_USER = "guoyu_1"  # JAccount账号，不带邮箱后缀
+EMAIL_HOST_USER = "zhaozh22"  # JAccount账号，不带邮箱后缀
 EMAIL_HOST_PASSWORD = ""  # JAccount密码
 EMAIL_USE_TLS = True
-EMAIL_FROM = "guoyu_1@sjtu.edu.cn"  # JAccount邮箱地址
+EMAIL_FROM = "zhaozh22@sjtu.edu.cn"  # JAccount邮箱地址
 EMAIL_TITLE = '邮箱激活'

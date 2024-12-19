@@ -11,9 +11,12 @@
     <title>用户登录</title>
     {% endif %}
     <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.css' %}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js" nonce="{{request.csp_nonce}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" nonce="{{request.csp_nonce}}"></script>
-    <style nonce="{{request.csp_nonce}}">
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js" nonce="{{request.csp_nonce}}"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" nonce="{{request.csp_nonce}}"></script>#}
+{#    <style nonce="{{request.csp_nonce}}">#}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js""></script>
+    <style>
         /* 全局背景图片 */
         body {
             margin: 0;
@@ -276,8 +279,10 @@
         </div>
     </div>
 
-    <script src="{% static 'jquery-3.6.0.min.js' %}" nonce="{{request.csp_nonce}}"></script>
-    <script type="text/javascript" nonce="{{request.csp_nonce}}">
+{#    <script src="{% static 'jquery-3.6.0.min.js' %}" nonce="{{request.csp_nonce}}"></script>#}
+{#    <script type="text/javascript" nonce="{{request.csp_nonce}}">#}
+    <script src="{% static 'jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript">
         // 点击刷新验证码
         $(function () {
             $("#imgCode").click(function () {

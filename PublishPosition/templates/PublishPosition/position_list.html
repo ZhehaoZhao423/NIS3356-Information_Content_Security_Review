@@ -23,7 +23,8 @@
         {% endfor %}
     </div>
 {% endif %}
-<style nonce="{{request.csp_nonce}}">
+{#<style nonce="{{request.csp_nonce}}">#}
+<style>
     .card-container {
         margin-top: 20px;
         padding-right: 20px;
@@ -272,7 +273,8 @@
                 <input type="hidden" name="resume_id" id="resume_id_input">
             </form>
             
-            <script nonce="{{request.csp_nonce}}">
+{#            <script nonce="{{request.csp_nonce}}">#}
+            <script>
                 document.getElementById('apply-all-btn').addEventListener('click', function() {
                     var positionIds = {{ position_ids|safe }};
                     var positionNames = {{position_names|safe}};
@@ -315,7 +317,8 @@
                                             {{ obj.position_name }}
                                         </div>
                                     </div>
-                                    <script nonce="{{request.csp_nonce}}">
+{#                                    <script nonce="{{request.csp_nonce}}">#}
+                                    <script>
                                         var myBox = document.getElementById('position-name-{{ obj.id }}');
                                         var text = myBox.innerText.trim();
                                         var maxLength = 12;
@@ -393,11 +396,15 @@
 {% endblock %}
 
 {% block js %}
-<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js" nonce="{{request.csp_nonce}}"></script>
-<script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js" nonce="{{request.csp_nonce}}"></script>
-<script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.min.js" nonce="{{request.csp_nonce}}"></script>
+{#<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js" nonce="{{request.csp_nonce}}"></script>#}
+{#<script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js" nonce="{{request.csp_nonce}}"></script>#}
+{#<script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.min.js" nonce="{{request.csp_nonce}}"></script>#}
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.min.js"></script>
 
-<script nonce="{{request.csp_nonce}}">
+{#<script nonce="{{request.csp_nonce}}">#}
+<script>
         $(document).ready(function(){
             $(".dropdown").hover(function(){
                 var dropdownMenu = $(this).children(".dropdown-menu");

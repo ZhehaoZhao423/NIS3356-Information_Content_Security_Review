@@ -7,7 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>私信页面</title>
-    <style nonce="{{request.csp_nonce}}">
+{#    <style nonce="{{request.csp_nonce}}">#}
+    <style>
         .chat-container {
             display: flex;
             height: 100vh;
@@ -231,8 +232,10 @@
     </style>
 <!--    <script nonce="{{request.csp_nonce}}"-->
 <!--        src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>-->
-    <script nonce="{{ request.csp_nonce }}" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script nonce="{{ request.csp_nonce }}" src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>
+{#    <script nonce="{{ request.csp_nonce }}" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>#}
+{#    <script nonce="{{ request.csp_nonce }}" src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>#}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>#}
+    <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>
 </head>
 
 <body>
@@ -296,7 +299,8 @@
             {% endif %}
         </div>
     </div>
-    <script nonce="{{request.csp_nonce}}">
+{#    <script nonce="{{request.csp_nonce}}">#}
+    <script>
         document.getElementById("searchForm").addEventListener("submit", function (event) {
             event.preventDefault();  // 阻止默认表单提交
 
@@ -317,7 +321,8 @@
         });
     </script>
 <!--    <script nonce="{{ request.csp_nonce }}" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>-->
-    <script nonce="{{ request.csp_nonce }}">
+{#    <script nonce="{{ request.csp_nonce }}">#}
+    <script>
         document.getElementById("searchForm").addEventListener("submit", function (event) {
             event.preventDefault();  // 阻止默认表单提交
 

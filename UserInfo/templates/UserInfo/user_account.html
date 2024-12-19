@@ -4,7 +4,8 @@
 
 {% block stylesheet %}
 
-    <style nonce="{{request.csp_nonce}}">
+{#    <style nonce="{{request.csp_nonce}}">#}
+    <style>
         legend {
             color: #17a2b8;
             border-bottom: 1px solid #17a2b8;
@@ -77,10 +78,14 @@
 
 {% block js %}
 
-<script src="{% static 'js/jquery-3.6.0.min.js' %}" nonce="{{request.csp_nonce}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js" nonce="{{request.csp_nonce}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" nonce="{{request.csp_nonce}}"></script>
-<script type="text/javascript" nonce="{{request.csp_nonce}}">
+{#<script src="{% static 'js/jquery-3.6.0.min.js' %}" nonce="{{request.csp_nonce}}"></script>#}
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js" nonce="{{request.csp_nonce}}"></script>#}
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" nonce="{{request.csp_nonce}}"></script>#}
+{#<script type="text/javascript" nonce="{{request.csp_nonce}}">#}
+<script src="{% static 'jquery-3.6.0.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+<script type="text/javascript">
     const interval = 30;
     let countdown = interval;
     let button = document.getElementById('sendemail');
