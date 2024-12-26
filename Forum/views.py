@@ -26,7 +26,12 @@ def get_matching_files(request):
 
 # Create your views here.
 def home(request):
-
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
+    
+    if user.identity in [2, 3]:  # HR 和管理员可以看到所有主题
+        topics = Topic.objects.order_by('last_updated')
+    else:  # 普通用户只能看到未隐藏的主题
+        topics = Topic.objects.filter(is_hidden=False).order_by('last_updated')
     topics = Topic.objects.order_by('last_updated')
 
     topics_per_page = 20
@@ -71,12 +76,25 @@ def new_topic(request):
 
 
 def topic_posts(request, pk):
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
     topic = get_object_or_404(Topic, pk=pk)
+
+    # 如果主题被隐藏，普通用户不能访问
+    if topic.is_hidden and user.identity not in [2, 3]:
+        return HttpResponse("您无权查看此主题。", status=403)
+
+    # 管理员和HR可以看到所有帖子，普通用户只能看到未隐藏的帖子
+    if user.identity in [2, 3]:
+        posts = topic.posts.all()
+    else:
+        posts = topic.posts.filter(is_hidden=False)
+
     topic.views += 1
     topic.save()
 
     context = {
         'topic': topic,
+        'posts': posts,
         'matching_files': get_matching_files(request),
     }
 
@@ -96,3 +114,75 @@ def reply_topic(request, pk):
     else:
         form = PostForm()
     return render(request, 'Forum/reply_topic.html', {'topic': topic, 'form': form})
+
+def delete_post(request, post_id):
+    """
+    删除单个帖子，仅管理员用户可以操作。
+    """
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
+    if user.identity != 3: 
+        return HttpResponse("您没有权限删除帖子。", status=403)
+    post = get_object_or_404(Post, id=post_id)
+    post.delete()
+
+    return redirect('Forum:topic_posts', pk=post.topic.pk)
+
+def delete_topic(request, topic_id):
+    """
+    删除整个主题及其相关的所有帖子，仅管理员用户可以操作。
+    """
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
+    if user.identity != 3:
+        return HttpResponse("您没有权限删除主题。", status=403)
+    topic = get_object_or_404(Topic, id=topic_id)
+    topic.delete()
+
+    return redirect('Forum:home')
+
+def hide_post(request, post_id):
+    """
+    隐藏帖子，仅限管理员用户操作。
+    """
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
+    if user.identity != 3:  
+        return HttpResponse("您没有权限隐藏帖子。", status=403)
+    post = get_object_or_404(Post, id=post_id)
+    post.is_hidden = True
+    post.save()
+    return redirect('Forum:topic_posts', pk=post.topic.pk)
+
+def unhide_post(request, post_id):
+    """
+    取消隐藏帖子，仅限管理员用户操作。
+    """
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
+    if user.identity != 3: 
+        return HttpResponse("您没有权限取消隐藏帖子。", status=403)
+    post = get_object_or_404(Post, id=post_id)
+    post.is_hidden = False
+    post.save()
+    return redirect('Forum:topic_posts', pk=post.topic.pk)
+
+def hide_topic(request, topic_id):
+    """
+    隐藏主题，仅限管理员用户操作。
+    """
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
+    if user.identity != 3:  
+        return HttpResponse("您没有权限隐藏主题。", status=403)
+    topic = get_object_or_404(Topic, id=topic_id)
+    topic.is_hidden = True
+    topic.save()
+    return redirect('Forum:home')
+
+def unhide_topic(request, topic_id):
+    """
+    取消隐藏主题，仅限管理员用户操作。
+    """
+    user = User.objects.get(id=request.session['UserInfo'].get('id'))
+    if user.identity != 3:  
+        return HttpResponse("您没有权限取消隐藏主题。", status=403)
+    topic = get_object_or_404(Topic, id=topic_id)
+    topic.is_hidden = False
+    topic.save()
+    return redirect('Forum:home')

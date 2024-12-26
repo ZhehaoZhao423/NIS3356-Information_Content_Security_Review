@@ -11,6 +11,7 @@ class Topic(models.Model):
     last_updated = models.DateTimeField(auto_now_add=True)
     starter = models.ForeignKey(User, related_name='topics', on_delete=models.CASCADE)
     views = models.PositiveIntegerField(default=0)
+    is_hidden = models.BooleanField(default=False, verbose_name="是否隐藏")
 
     def __str__(self):
         return self.subject
@@ -23,6 +24,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(null=True)
     created_by = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
     updated_by = models.ForeignKey(User, null=True, related_name='+', on_delete=models.CASCADE)
+    is_hidden = models.BooleanField(default=False, verbose_name="是否隐藏")
 
     def __str__(self):
         truncated_message = Truncator(self.message)
