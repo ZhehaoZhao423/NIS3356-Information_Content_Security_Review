@@ -5,12 +5,13 @@
 {% block content %}
 <div style="border-radius: 10px;" class="mt-4 p-4 bg-light">
 
-    <h1 style="border-bottom: 2px solid #17a2b8;" class="pb-2">
+    <h1 style="border-bottom: 2px solid #17a2b8;font-size: 2em" class="pb-2">
         {{ topic.subject }}
     </h1>
     {% for post in topic.posts.all %}
     <div
-        style="{% if forloop.first %}border-bottom: 2px solid #17a2b8;{% else %}border-bottom: 1px solid #dddddd;{% endif %}">
+        style=" {% if forloop.first %} border-bottom : 2px solid #17a2b8; font-size: 1em; {% else %} border-bottom: 1px solid #dddddd; font-size: 1em;{% endif %}">
+
         <div class="row mb-2 mt-2">
             <div class="d-inline-block">
                 <a href="{% url 'UserInfo:index' post.created_by.id %}" class="text-decoration-none">
@@ -40,8 +41,8 @@
 
         {% if forloop.first %}
         <div class="d-flex justify-content-end mb-2">
-            {# <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i
-                    class="fas fa-reply me-1"></i>回复</a> #}
+            <!-- <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i
+                    class="fas fa-reply me-1"></i>回复</a> -->
         </div>
         {% endif %}
     </div>
