@@ -99,7 +99,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
         'USER': 'root',  #用户名
-        'PASSWORD': '123456',  #用户密码
+        'PASSWORD': '100121',  #用户密码
         'HOST': '127.0.0.1',  # MySQL 在哪个 ip
         'PORT': '3306',  # 端口号
     }
@@ -143,19 +143,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = '/var/static/' # This is Client version
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static"),
-#     os.path.join(BASE_DIR, 'static','plugins'),
-#     os.path.join(BASE_DIR, 'static','js'),
-#     os.path.join(BASE_DIR, 'static','img'),
-# ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # This is Client version
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static/plugins'),  # 插件目录
-    os.path.join(BASE_DIR, 'static/js'),  # JS 目录
-    os.path.join(BASE_DIR, 'static/img'),  # 图片目录
+    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, 'static', 'plugins'),
+    os.path.join(BASE_DIR, 'static', 'js'),
+    os.path.join(BASE_DIR, 'static', 'img'),
+    os.path.join(BASE_DIR, 'static', 'css'),
 ]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static', 'plugins'),
+#     os.path.join(BASE_DIR, 'static', 'js'),
+#     os.path.join(BASE_DIR, 'static', 'img'),
+#     os.path.join(BASE_DIR, 'static/images'),
+#     os.path.join(BASE_DIR, 'static/css')
+# ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

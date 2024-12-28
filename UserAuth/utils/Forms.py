@@ -6,35 +6,37 @@ from UserAuth.utils.bootstrapform import BootStrapForm
 from UserAuth.utils.validators import is_username_valid
 from UserAuth.utils.encrypt import rsa_decrypt_password
 
+
 class RegisterForm(BootStrapForm, forms.ModelForm):
-    password = forms.CharField(
-        label="密码",
-        max_length=350,
-        widget=forms.PasswordInput(attrs={'placeholder': '请输入密码'}, render_value=True)
-    )
-    check_password = forms.CharField(
-        label="确认密码",
-        max_length=350,
-        widget=forms.PasswordInput(attrs={'placeholder': '确认密码'}, render_value=True)
-    )
+    password = forms.CharField(label="密码",
+                               max_length=350,
+                               widget=forms.PasswordInput(
+                                   attrs={'placeholder': '请输入密码'},
+                                   render_value=True))
+    check_password = forms.CharField(label="确认密码",
+                                     max_length=350,
+                                     widget=forms.PasswordInput(
+                                         attrs={'placeholder': '确认密码'},
+                                         render_value=True))
     mobile_phone = forms.CharField(
         label="手机号",
         max_length=32,
-        validators=[RegexValidator(r'^(1[3|4|5|6|7|8|9])\d{9}$', '手机号格式错误')]
-    )
+        validators=[RegexValidator(r'^(1[3|4|5|6|7|8|9])\d{9}$', '手机号格式错误')])
     email = forms.CharField(
         label="邮箱",
         max_length=32,
-        validators=[RegexValidator(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', '邮箱格式错误')]
-    )
-    verification_code = forms.CharField(
-        label="验证码",
-        max_length=10
-    )
+        validators=[
+            RegexValidator(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                           '邮箱格式错误')
+        ])
+    verification_code = forms.CharField(label="验证码", max_length=10)
 
     class Meta:
         model = models.User
-        fields = ['username', 'password', 'check_password', 'gender', 'mobile_phone', 'email', 'verification_code']
+        fields = [
+            'username', 'password', 'check_password', 'gender', 'mobile_phone',
+            'email', 'verification_code'
+        ]
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -43,25 +45,30 @@ class RegisterForm(BootStrapForm, forms.ModelForm):
     def clean_username(self):
         if not is_username_valid(self.cleaned_data['username']):
             raise ValidationError("用户名不允许存在特殊字符")
-        if models.User.objects.filter(username=self.cleaned_data["username"]).exists():
+        if models.User.objects.filter(
+                username=self.cleaned_data["username"]).exists():
             raise ValidationError("用户名已存在")
         return self.cleaned_data['username']
 
     def clean_mobile_phone(self):
-        if models.User.objects.filter(mobile_phone=self.cleaned_data['mobile_phone']).exists():
+        if models.User.objects.filter(
+                mobile_phone=self.cleaned_data['mobile_phone']).exists():
             raise ValidationError("手机号已存在")
         return self.cleaned_data['mobile_phone']
 
     def clean_email(self):
-        if models.User.objects.filter(email=self.cleaned_data["email"]).exists():
+        if models.User.objects.filter(
+                email=self.cleaned_data["email"]).exists():
             raise ValidationError("邮箱已存在")
         return self.cleaned_data['email']
 
     def clean_verification_code(self):
-        code_in_session = self.request.session.get('register_verification_code')
+        code_in_session = self.request.session.get(
+            'register_verification_code')
         if not code_in_session:
             raise ValidationError("验证码已过期")
-        if not self.cleaned_data['verification_code'].upper() == code_in_session.upper():
+        if not self.cleaned_data['verification_code'].upper(
+        ) == code_in_session.upper():
             raise ValidationError("验证码错误")
         return self.cleaned_data['verification_code']
 
@@ -101,15 +108,12 @@ class RegisterForm(BootStrapForm, forms.ModelForm):
 
 
 class LoginForm(BootStrapForm, forms.ModelForm):
-    password = forms.CharField(
-        label="密码",
-        max_length=350,
-        widget=forms.PasswordInput(attrs={'placeholder': '请输入密码'}, render_value=True)
-    )
-    verification_code = forms.CharField(
-        label="图形验证码",
-        max_length=32
-    )
+    password = forms.CharField(label="密码",
+                               max_length=350,
+                               widget=forms.PasswordInput(
+                                   attrs={'placeholder': '请输入密码'},
+                                   render_value=True))
+    verification_code = forms.CharField(label="图形验证码", max_length=32)
 
     class Meta:
         model = models.User
@@ -120,18 +124,20 @@ class LoginForm(BootStrapForm, forms.ModelForm):
         self.request = request
 
     def clean_password(self):
-        row_obj = models.User.objects.filter(username=self.cleaned_data.get('username')).first()
+        row_obj = models.User.objects.filter(
+            username=self.cleaned_data.get('username')).first()
         encrypted_password = (self.cleaned_data['password'])
         encrypted_password_hash = rsa_decrypt_password(encrypted_password)
         # 这里得到的encrypted_password_hash是bytes类型，要将其转成str比较
-        str_decoded_encrypted_password_hash = encrypted_password_hash.decode('latin1')
-        print("str_decoded_encrypted_password_hash: ", str_decoded_encrypted_password_hash)
-        print("row obj password: ", row_obj.password)
-        print("str_decoded_encrypted_password_hash == row obj password ? ", str_decoded_encrypted_password_hash == row_obj.password)
-        print("Type of str_decoded_encrypted_password_hash: ", type(str_decoded_encrypted_password_hash))
-        print("Type of row_obj.password: ", type(row_obj.password))
-        print("Length of str_decoded_encrypted_password_hash: ", len(str_decoded_encrypted_password_hash))
-        print("Length of row_obj.password: ", len(row_obj.password))
+        str_decoded_encrypted_password_hash = encrypted_password_hash.decode(
+            'latin1')
+        # print("str_decoded_encrypted_password_hash: ", str_decoded_encrypted_password_hash)
+        # print("row obj password: ", row_obj.password)
+        # print("str_decoded_encrypted_password_hash == row obj password ? ", str_decoded_encrypted_password_hash == row_obj.password)
+        # print("Type of str_decoded_encrypted_password_hash: ", type(str_decoded_encrypted_password_hash))
+        # print("Type of row_obj.password: ", type(row_obj.password))
+        # print("Length of str_decoded_encrypted_password_hash: ", len(str_decoded_encrypted_password_hash))
+        # print("Length of row_obj.password: ", len(row_obj.password))
 
         if row_obj and str_decoded_encrypted_password_hash == row_obj.password:
             return ''
@@ -143,7 +149,8 @@ class LoginForm(BootStrapForm, forms.ModelForm):
         if not code_in_session:
             raise ValidationError("验证码已过期")
         # 将用户输入的验证码转换为小写进行比较
-        if not self.cleaned_data['verification_code'].lower() == code_in_session.lower():
+        if not self.cleaned_data['verification_code'].lower(
+        ) == code_in_session.lower():
             raise ValidationError("验证码错误")
         return self.cleaned_data['verification_code']
 
@@ -153,27 +160,25 @@ class ResetPasswordForm(BootStrapForm, forms.Form):
         label="手机号或用户名",
         max_length=64,
     )
-    password = forms.CharField(
-        label="新密码",
-        max_length=350,
-        widget=forms.PasswordInput(attrs={'placeholder': '请输入密码'}, render_value=True)
-    )
-    check_password = forms.CharField(
-        label="确认新密码",
-        max_length=350,
-        widget=forms.PasswordInput(attrs={'placeholder': '请确认新密码'}, render_value=True)
-    )
-    verification_code = forms.CharField(
-        label="邮箱验证码",
-        max_length=32
-    )
+    password = forms.CharField(label="新密码",
+                               max_length=350,
+                               widget=forms.PasswordInput(
+                                   attrs={'placeholder': '请输入密码'},
+                                   render_value=True))
+    check_password = forms.CharField(label="确认新密码",
+                                     max_length=350,
+                                     widget=forms.PasswordInput(
+                                         attrs={'placeholder': '请确认新密码'},
+                                         render_value=True))
+    verification_code = forms.CharField(label="邮箱验证码", max_length=32)
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.request = request
 
     def clean_verification_code(self):
-        code_in_session = self.request.session.get('reset_password_verification_code')
+        code_in_session = self.request.session.get(
+            'reset_password_verification_code')
         if not code_in_session:
             raise ValidationError("验证码已过期")
         if not self.cleaned_data['verification_code'] == code_in_session:
