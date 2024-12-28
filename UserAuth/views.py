@@ -48,7 +48,8 @@ def register(request):
     obj = models.User.objects.filter(username=form.cleaned_data["username"]).first()
     request.session["UserInfo"] = {
         'id': obj.id,
-        'username': obj.username
+        'username': obj.username,
+        'identity': obj.identity
     }
     request.session.set_expiry(60 * 60 * 24 * 7)  # 7天免登录
     return redirect("/")
@@ -74,8 +75,10 @@ def login(request):
     row_obj = models.User.objects.filter(username=form.cleaned_data['username']).first()
     request.session["UserInfo"] = {
         'id': row_obj.id,
-        'username': row_obj.username
+        'username': row_obj.username,
+        'identity': row_obj.identity
     }
+    request.session.modified = True  # 强制保存会话
     request.session.set_expiry(60 * 60 * 24 * 7)  # 7天免登录
     return redirect(reverse('Forum:home'))
 

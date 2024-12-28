@@ -102,15 +102,24 @@
         </a>
     </div>
 
-    {% if topics %}
+{% if topics %}
     {% for topic in topics %}
     <div class="topic-card">
         <div class="row">
+            <!-- 显示主题标题 -->
             <div class="col-8 d-flex align-items-center">
                 <a href="{% url 'Forum:topic_posts' topic.pk %}" class="text-decoration-none text-dark" style="font-weight: 600;">
                     {{ topic.subject }}
                 </a>
+                <!-- 如果主题已隐藏，显示“已隐藏”的标志，仅管理员和HR用户可见 -->
+                {% if topic.is_hidden %}
+                    {% if request.session.UserInfo.identity == 2 or request.session.UserInfo.identity == 3 %}
+                    <span class="badge bg-warning text-dark ms-2">已隐藏</span>
+                    {% endif %}
+                {% endif %}
             </div>
+
+            <!-- 显示主题发起者头像 -->
             <div class="col-1 d-flex align-items-center">
                 <a href="{% url 'UserInfo:index' topic.starter.id %}">
                     {% with user_id=topic.starter.id|stringformat:'d' %}
@@ -127,16 +136,43 @@
                     {% endwith %}
                 </a>
             </div>
+
+            <!-- 显示浏览次数 -->
             <div class="col-1 d-flex justify-content-center align-items-center text-muted">
                 {{ topic.views }}
             </div>
+
+            <!-- 显示最后更新时间 -->
             <div class="col-2 d-flex justify-content-center align-items-center text-muted">
                 {{ topic.last_updated|naturaltime }}
             </div>
         </div>
+
+        <!-- 管理员和HR用户操作按钮 -->
+        {% if request.session.UserInfo.identity == 3 %}
+        <div class="row mt-2">
+            <div class="col-12 d-flex justify-content-end">
+                <!-- 如果主题已隐藏，显示“取消隐藏”按钮 -->
+                {% if topic.is_hidden %}
+                <a href="{% url 'Forum:unhide_topic' topic.id %}" class="btn btn-success btn-sm me-2">
+                    <i class="fas fa-eye"></i> 取消隐藏
+                </a>
+                {% else %}
+                <!-- 如果主题未隐藏，显示“隐藏”按钮 -->
+                <a href="{% url 'Forum:hide_topic' topic.id %}" class="btn btn-warning btn-sm me-2">
+                    <i class="fas fa-eye-slash"></i> 隐藏
+                </a>
+                {% endif %}
+                <!-- 删除主题按钮 -->
+                <a href="{% url 'Forum:delete_topic' topic.id %}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash-alt"></i> 删除
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% endfor %}
-    {% endif %}
+{% endif %}
 
     <div class="row col-md-12" style="margin-top: 50px; margin-bottom: 30px;">
         <div class="pagination d-flex justify-content-center align-items-center">

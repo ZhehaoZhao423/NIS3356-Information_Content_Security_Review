@@ -3,12 +3,32 @@
 {% load static humanize static_tags %}
 
 {% block content %}
-    <div style="border-radius: 10px;" class="mt-4 p-4 bg-light">
+<div style="border-radius: 10px;" class="mt-4 p-4 bg-light">
 
-        <h1 style="border-bottom: 2px solid #17a2b8;" class="pb-2">
-            {{ topic.subject }}
-        </h1>
-        {% for post in topic.posts.all %}
+    <h1 style="border-bottom: 2px solid #17a2b8;" class="pb-2">
+        {{ topic.subject }}
+        <!-- 如果主题被隐藏，管理员可见标识 -->
+        {% if topic.is_hidden and request.session.UserInfo.identity == 3 %}
+            <span class="badge bg-warning text-dark ms-2">主题已隐藏</span>
+        {% endif %}
+    </h1>
+
+    <!-- 如果当前用户是管理员，显示隐藏/取消隐藏按钮 -->
+    {% if request.session.UserInfo.identity == 3 %}
+        {% if topic.is_hidden %}
+            <a href="{% url 'Forum:unhide_topic' topic.id %}" class="btn btn-success btn-sm mb-3">
+                <i class="fas fa-eye"></i> 取消隐藏主题
+            </a>
+        {% else %}
+            <a href="{% url 'Forum:hide_topic' topic.id %}" class="btn btn-warning btn-sm mb-3">
+                <i class="fas fa-eye-slash"></i> 隐藏主题
+            </a>
+        {% endif %}
+    {% endif %}
+
+    {% for post in topic.posts.all %}
+        <!-- 仅显示未隐藏的帖子或当前用户有权限查看的帖子 -->
+        {% if not post.is_hidden or request.session.UserInfo.identity == 2 or request.session.UserInfo.identity == 3 %}
             <div style="{% if forloop.first %}border-bottom: 2px solid #17a2b8;{% else %}border-bottom: 1px solid #dddddd;{% endif %}">
                 <div class="row mb-2 mt-2">
                     <div class="d-inline-block">
@@ -35,18 +55,46 @@
                     {{ post.get_message_as_markdown }}
                 </div>
 
+                <!-- 如果帖子被隐藏，显示标识 -->
+                {% if post.is_hidden %}
+                    <span class="badge bg-warning text-dark ms-2">已隐藏</span>
+                {% endif %}
+
                 {% if forloop.first %}
                     <div class="d-flex justify-content-end mb-2">
                         {# <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i class="fas fa-reply me-1"></i>回复</a> #}
                     </div>
                 {% endif %}
+
+                <!-- 操作按钮，仅管理员可见 -->
+                <div class="d-flex justify-content-end mb-2">
+                    {% if request.session.UserInfo.identity == 3 %}
+                        <!-- 隐藏或取消隐藏按钮 -->
+                        {% if post.is_hidden %}
+                            <a href="{% url 'Forum:unhide_post' post.id %}" class="btn btn-success btn-sm me-2">
+                                <i class="fas fa-eye"></i> 取消隐藏
+                            </a>
+                        {% else %}
+                            <a href="{% url 'Forum:hide_post' post.id %}" class="btn btn-warning btn-sm me-2">
+                                <i class="fas fa-eye-slash"></i> 隐藏
+                            </a>
+                        {% endif %}
+                        <!-- 删除按钮 -->
+                        <form method="post" action="{% url 'Forum:delete_post' post.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt"></i> 删除
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
+        {% endif %}
+    {% endfor %}
 
-        {% endfor %}
-
-        <div class="mt-4">
-            <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i class="fas fa-reply me-1"></i>回复</a>
-        </div>
+    <div class="mt-4">
+        <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i class="fas fa-reply me-1"></i>回复</a>
     </div>
+</div>
 
 {% endblock %}
