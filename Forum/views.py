@@ -62,18 +62,21 @@ def new_topic(request):
         if form.is_valid():
             topic = form.save(commit=False)
             topic.starter = User.objects.get(pk=request.session['UserInfo'].get('id'))
-            topic.save()
 
             # 内容审核逻辑
             user_message = form.cleaned_data.get('message')
             is_violating = check(user_message)  # 调用内容审核函数
+
+            # 设置主题的隐藏状态
+            topic.is_hidden = is_violating  # 如果内容违规，将主题设置为隐藏
+            topic.save()
 
             # 创建第一条帖子
             post = Post.objects.create(
                 message=user_message,
                 topic=topic,
                 created_by=topic.starter,
-                is_hidden=is_violating  # 根据审核结果设置隐藏状态
+                is_hidden=is_violating  # 帖子和主题的隐藏状态一致
             )
 
             return redirect('Forum:topic_posts', pk=topic.pk)
@@ -86,6 +89,7 @@ def new_topic(request):
         'matching_files': get_matching_files(request),
     }
     return render(request, 'Forum/new_topic.html', context)
+
 
 
 
