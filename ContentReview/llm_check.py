@@ -1,15 +1,28 @@
 from modelscope import AutoModelForCausalLM, AutoTokenizer
 import copy
 
+# PROMPT_TEMPLATE = """你将接收用户的发帖内容并分析其是否涉及辱骂、色情或涉政等违禁内容。请基于以下要求完成任务：
+#
+# 分析要求：
+# 全面对比：结合参考案例，通过关键词、语义及潜在含义分析用户发帖是否涉及违禁内容。
+# 逐步推理：详细说明你的分析过程，包括是否与参考案例存在类似模式或逻辑，但是最终输出中不要输出你的分析过程。
+# 具体说明：明确违禁类型（辱骂、色情、涉政）及其判断理由。
+#
+# 下面是“参考案例”即被标注的正确结果，你需要参考这些案例来对用户发帖内容：“<input>”进行判断，其中第一项为是否涉及违禁内容的标注，第二项为参考案例的发帖内容：
+# <examples>
+#
+# 你需要进行判断的用户发帖内容为：
+# <input>
+#
+# 回复格式：只回答是或否，不要输出你的分析过程和判断理由。
+# 是否包含违禁内容：
+# """
+
 PROMPT_TEMPLATE = """你将接收用户的发帖内容并分析其是否涉及辱骂、色情或涉政等违禁内容。请基于以下要求完成任务：
 
 分析要求：
-全面对比：结合参考案例，通过关键词、语义及潜在含义分析用户发帖是否涉及违禁内容。
-逐步推理：详细说明你的分析过程，包括是否与参考案例存在类似模式或逻辑，但是最终输出中不要输出你的分析过程。
-具体说明：明确违禁类型（辱骂、色情、涉政）及其判断理由。
-
-下面是“参考案例”即被标注的正确结果，你需要参考这些案例来对用户发帖内容：“<input>”进行判断，其中第一项为是否涉及违禁内容的标注，第二项为参考案例的发帖内容：
-<examples>
+如果用户发帖内容包含以下内容，请回答“是”：
+成人电影
 
 你需要进行判断的用户发帖内容为：
 <input>
@@ -72,7 +85,7 @@ def check(input):
     # input = "大学生要认真学习"
 
     request_prompt= copy.deepcopy(PROMPT_TEMPLATE)
-    request_prompt = request_prompt.replace("<examples>", examples)
+    # request_prompt = request_prompt.replace("<examples>", examples)
     request_prompt = request_prompt.replace("<input>", input)
 
     # prompt = "请用简短的语言介绍一下大型语言模型。"
@@ -85,8 +98,8 @@ def check(input):
         tokenize=False,
         add_generation_prompt=True
     )
-    # print("Generated text input for the model:")
-    # print(text)
+    print("Generated text input for the model:")
+    print(text)
 
     model_inputs = tokenizer([text], return_tensors="pt").to(device)
 
@@ -99,8 +112,8 @@ def check(input):
     ]
 
     response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-    # print("Qwen gives the response:")
-    # print(response)
+    print("Qwen gives the response:")
+    print(response)
 
     if response:
         return response[0] == "是"
