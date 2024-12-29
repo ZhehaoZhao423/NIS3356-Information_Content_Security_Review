@@ -7,15 +7,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Django 论坛{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.min.css' %}"> -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-{#    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js" nonce="{{request.csp_nonce}}"></script>#}
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js"
+        nonce="{{request.csp_nonce}}"></script>
     <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js"></script>
     {% block stylesheet %}{% endblock %}
-{#    <style nonce="{{request.csp_nonce}}">#}
+
+
     <style>
         /* 页面背景和文字自定义颜色 */
         body.custom-background {
@@ -53,71 +56,103 @@
         }
 
         .navbar-nav {
-            font-family: 'Arial', sans-serif; /* 更改字体 */
-            font-size: 1.1rem; /* 调整字体大小 */
+            font-family: 'Arial', sans-serif;
+            /* 更改字体 */
+            font-size: 1.1rem;
+            /* 调整字体大小 */
         }
 
         .nav-link {
-            color: #ffffff; /* 链接的基本颜色 */
-            padding: 10px 15px; /* 内边距 */
-            transition: background-color 0.3s ease, color 0.3s ease; /* 背景颜色和文字颜色变化的过渡 */
-            border-radius: 0.5rem; /* 加大倒角 */
+            color: #ffffff;
+            /* 链接的基本颜色 */
+            padding: 10px 15px;
+            /* 内边距 */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            /* 背景颜色和文字颜色变化的过渡 */
+            border-radius: 0.5rem;
+            /* 加大倒角 */
         }
 
         .nav-link:hover {
-            background-color: #6c757d; /* 悬停时背景色 */
-            color: #d4edda; /* 悬停时文字颜色 */
-            transform: scale(1.05); /* 悬停时放大效果 */
+            background-color: #6c757d;
+            /* 悬停时背景色 */
+            color: #d4edda;
+            /* 悬停时文字颜色 */
+            transform: scale(1.05);
+            /* 悬停时放大效果 */
         }
 
         .custom-nav-link {
-            position: relative; /* 为伪元素定位 */
+            position: relative;
+            /* 为伪元素定位 */
         }
 
         .custom-nav-link::after {
-            content: ""; /* 创建一个伪元素 */
-            display: block; /* 设置为块级元素 */
-            height: 3px; /* 下划线的高度 */
-            width: 0; /* 初始宽度为0 */
-            background: #98d99e; /* 下划线颜色 */
-            transition: width 0.3s; /* 宽度变化的过渡 */
-            position: absolute; /* 绝对定位 */
-            left: 50%; /* 向左移动50% */
-            bottom: -5px; /* 向下移动5px */
+            content: "";
+            /* 创建一个伪元素 */
+            display: block;
+            /* 设置为块级元素 */
+            height: 3px;
+            /* 下划线的高度 */
+            width: 0;
+            /* 初始宽度为0 */
+            background: #98d99e;
+            /* 下划线颜色 */
+            transition: width 0.3s;
+            /* 宽度变化的过渡 */
+            position: absolute;
+            /* 绝对定位 */
+            left: 50%;
+            /* 向左移动50% */
+            bottom: -5px;
+            /* 向下移动5px */
         }
 
         .custom-nav-link:hover::after {
-            width: 100%; /* 悬停时下划线宽度为100% */
-            left: 0; /* 向左移动到0 */
+            width: 100%;
+            /* 悬停时下划线宽度为100% */
+            left: 0;
+            /* 向左移动到0 */
         }
 
 
         /* 页脚样式 */
         footer {
-            background-color: #343a40; /* 页脚背景颜色 */
-            color: #adb5bd; /* 文字颜色 */
-            padding: 20px 0; /* 增加上下内边距 */
+            background-color: #343a40;
+            /* 页脚背景颜色 */
+            color: #adb5bd;
+            /* 文字颜色 */
+            padding: 20px 0;
+            /* 增加上下内边距 */
         }
 
         footer a {
-            color: #adb5bd; /* 链接颜色 */
-            transition: color 0.3s ease; /* 添加平滑过渡 */
+            color: #adb5bd;
+            /* 链接颜色 */
+            transition: color 0.3s ease;
+            /* 添加平滑过渡 */
         }
 
         footer a:hover {
-            color: #ffffff; /* 悬停时链接颜色 */
-            text-decoration: underline; /* 悬停时添加下划线 */
+            color: #ffffff;
+            /* 悬停时链接颜色 */
+            text-decoration: underline;
+            /* 悬停时添加下划线 */
         }
 
         /* 页脚中间对齐文本 */
         footer .row {
-            justify-content: center; /* 中间对齐 */
+            justify-content: center;
+            /* 中间对齐 */
         }
 
         footer h5 {
-            color: #ffffff; /* 页脚标题颜色 */
-            font-weight: bold; /* 加粗字体 */
-            margin-bottom: 15px; /* 增加下边距 */
+            color: #ffffff;
+            /* 页脚标题颜色 */
+            font-weight: bold;
+            /* 加粗字体 */
+            margin-bottom: 15px;
+            /* 增加下边距 */
         }
 
         /* 用户头像样式 */
@@ -129,40 +164,62 @@
         }
 
         .dropdown-menu {
-            background-color: #ffffff; /* 背景颜色 */
-            border: 1px solid #dee2e6; /* 边框颜色 */
-            border-radius: 0.5rem; /* 圆角 */
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); /* 阴影效果 */
-            min-width: 100px; /* 设置最小宽度 */
-            width: auto; /* 允许根据内容自动调整宽度 */
-            padding: 0; /* 去掉内边距 */
+            background-color: #ffffff;
+            /* 背景颜色 */
+            border: 1px solid #dee2e6;
+            /* 边框颜色 */
+            border-radius: 0.5rem;
+            /* 圆角 */
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+            /* 阴影效果 */
+            min-width: 100px;
+            /* 设置最小宽度 */
+            width: auto;
+            /* 允许根据内容自动调整宽度 */
+            padding: 0;
+            /* 去掉内边距 */
         }
 
         .dropdown-item {
-            color: #343a40; /* 文字颜色 */
-            padding: 10px 15px; /* 内边距 */
-            transition: background-color 0.3s ease, transform 0.3s ease; /* 背景颜色变化和缩放效果的过渡 */
+            color: #343a40;
+            /* 文字颜色 */
+            padding: 10px 15px;
+            /* 内边距 */
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            /* 背景颜色变化和缩放效果的过渡 */
         }
 
         .dropdown-item:hover {
-            background-color: #e2f0e2; /* 悬停时加深背景颜色 */
-            color: #98d99e; /* 悬停时文字颜色为淡绿色 */
-            text-decoration: none; /* 去掉下划线 */
-            transform: scale(1.05); /* 悬停时文字放大 */
+            background-color: #e2f0e2;
+            /* 悬停时加深背景颜色 */
+            color: #98d99e;
+            /* 悬停时文字颜色为淡绿色 */
+            text-decoration: none;
+            /* 去掉下划线 */
+            transform: scale(1.05);
+            /* 悬停时文字放大 */
         }
 
         .form-control {
-            border-radius: 0.75rem; /* 加大倒角 */
-            border: 1px solid #17a2b8; /* 边框颜色 */
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); /* 阴影效果 */
-            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* 边框颜色变化和阴影效果的过渡 */
-            font-size: 1rem; /* 字体大小 */
+            border-radius: 0.75rem;
+            /* 加大倒角 */
+            border: 1px solid #17a2b8;
+            /* 边框颜色 */
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+            /* 阴影效果 */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            /* 边框颜色变化和阴影效果的过渡 */
+            font-size: 1rem;
+            /* 字体大小 */
         }
 
         .form-control:focus {
-            border-color: #17a2b8; /* 聚焦时边框颜色 */
-            box-shadow: 0 0.5rem 1rem rgba(0, 155, 70, 0.5); /* 聚焦时的阴影效果 */
-            outline: none; /* 去掉默认聚焦轮廓 */
+            border-color: #17a2b8;
+            /* 聚焦时边框颜色 */
+            box-shadow: 0 0.5rem 1rem rgba(0, 155, 70, 0.5);
+            /* 聚焦时的阴影效果 */
+            outline: none;
+            /* 去掉默认聚焦轮廓 */
         }
     </style>
 </head>
@@ -173,22 +230,22 @@
     <nav class="navbar navbar-expand-sm navbar-light bg-light shadow-sm">
         <div class="container">
             <a class="navbar-brand custom-text-color" href="{% url 'Forum:home' %}">JobRecruitment</a>
-            <button class="navbar-toggler btn custom-button" type="button" data-bs-toggle="collapse"
+            <!-- <button class="navbar-toggler btn custom-button" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbar">
                 <span class="navbar-toggler-icon"></span>
-            </button>
+            </button> -->
             <div class="collapse navbar-collapse" id="navbar">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link custom-nav-link" href="{% url 'Forum:home' %}">首页</a>
+                        <a class="nav-link custom-nav-link" href="{% url 'Forum:home' %}" style="color:#6c757d">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link custom-nav-link" href="{% url 'PublishPosition:publish_list' %}">职位</a>
+                        <a class="nav-link custom-nav-link" href="{% url 'PublishPosition:publish_list' %}"
+                            style="color:#6c757d">职位</a>
                     </li>
                 </ul>
                 <form class="d-flex" method="get" action="/position/list/">
-                    <input class="form-control me-2" type="text" name="keyword" placeholder="搜索职位"
-                        aria-label="Search">
+                    <input class="form-control me-2" type="text" name="keyword" placeholder="搜索职位" aria-label="Search">
                     <button class="btn custom-button" type="submit"><i class="fas fa-search"></i></button>
                 </form>
                 {% if 'UserInfo' in request.session %}
@@ -284,8 +341,7 @@
     </footer>
     {% endblock %}
 
-{#    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" nonce="{{request.csp_nonce}}"></script>#}
-{#    <script nonce="{{request.csp_nonce}}">#}
+
     <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script>
         $(document).ready(function () {

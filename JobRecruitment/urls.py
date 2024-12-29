@@ -21,6 +21,7 @@ from django.views.static import serve
 from django.conf import settings
 
 from UserAuth import views
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("", include('Forum.urls')),
@@ -34,6 +35,6 @@ urlpatterns = [
     path("message/", include("UserMessage.urls")),
     # path("privatemessage/", include("PrivateMessage.urls")),  # 为 PrivateMessage 设定新的路径
     path('conversation/', include('PrivateMessage.urls')),
-
-    re_path(r'media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
-]
+    re_path(r'media/(?P<path>.*)', serve,
+            {'document_root': settings.MEDIA_ROOT}),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
