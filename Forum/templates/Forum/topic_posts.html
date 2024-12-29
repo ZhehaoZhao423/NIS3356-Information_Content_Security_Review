@@ -27,73 +27,74 @@
     {% endif %}
 
     {% for post in topic.posts.all %}
-        <!-- 仅显示未隐藏的帖子或当前用户有权限查看的帖子 -->
-        {% if not post.is_hidden or request.session.UserInfo.identity == 2 or request.session.UserInfo.identity == 3 %}
-            <div style="{% if forloop.first %}border-bottom: 2px solid #17a2b8;{% else %}border-bottom: 1px solid #dddddd;{% endif %}">
-                <div class="row mb-2 mt-2">
-                    <div class="d-inline-block">
-                        <a href="{% url 'UserInfo:index' post.created_by.id %}" class="text-decoration-none">
-                            {% with user_id=post.created_by.id|stringformat:'d' %}
-                                {% with user_avatar_path="images/"|add:user_id %}
-                                    {% query_image_extension user_avatar_path as user_avatar_full_path %}
-                                    {% with default_avatar_path='images/default.jpeg' %}
-                                        {% if user_avatar_full_path|static_file_exists %}
-                                            <img src="{% static user_avatar_full_path %}?rand=<%= Date.now() %>" alt="用户头像" class="rounded-circle" style="width:50px; height:50px;">
-                                        {% else %}
-                                            <img src="{% static default_avatar_path %}" alt="默认头像" class="rounded-circle" style="width:50px; height:50px;">
-                                        {% endif %}
-                                    {% endwith %}
-                                {% endwith %}
-                            {% endwith %}
-                        </a>
-                        <span class="ms-1 text-muted">
-                            {{ post.created_by.username }}
-                        </span>
-                    </div>
-                </div>
-                <div class="row" style="margin-left: 47px;">
-                    {{ post.get_message_as_markdown }}
-                </div>
+    <div
+        style=" {% if forloop.first %} border-bottom : 2px solid #17a2b8; font-size: 1em; {% else %} border-bottom: 1px solid #dddddd; font-size: 1em;{% endif %}">
 
-                <!-- 如果帖子被隐藏，显示标识 -->
-                {% if post.is_hidden %}
-                    <span class="badge bg-warning text-dark ms-2">已隐藏</span>
-                {% endif %}
-
-                {% if forloop.first %}
-                    <div class="d-flex justify-content-end mb-2">
-                        {# <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i class="fas fa-reply me-1"></i>回复</a> #}
-                    </div>
-                {% endif %}
-
-                <!-- 操作按钮，仅管理员可见 -->
-                <div class="d-flex justify-content-end mb-2">
-                    {% if request.session.UserInfo.identity == 3 %}
-                        <!-- 隐藏或取消隐藏按钮 -->
-                        {% if post.is_hidden %}
-                            <a href="{% url 'Forum:unhide_post' post.id %}" class="btn btn-success btn-sm me-2">
-                                <i class="fas fa-eye"></i> 取消隐藏
-                            </a>
-                        {% else %}
-                            <a href="{% url 'Forum:hide_post' post.id %}" class="btn btn-warning btn-sm me-2">
-                                <i class="fas fa-eye-slash"></i> 隐藏
-                            </a>
-                        {% endif %}
-                        <!-- 删除按钮 -->
-                        <form method="post" action="{% url 'Forum:delete_post' post.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash-alt"></i> 删除
-                            </button>
-                        </form>
+        <div class="row mb-2 mt-2">
+            <div class="d-inline-block">
+                <a href="{% url 'UserInfo:index' post.created_by.id %}" class="text-decoration-none">
+                    {% with user_id=post.created_by.id|stringformat:'d' %}
+                    {% with user_avatar_path="images/"|add:user_id %}
+                    {% query_image_extension user_avatar_path as user_avatar_full_path %}
+                    {% with default_avatar_path='images/default.jpeg' %}
+                    {% if user_avatar_full_path|static_file_exists %}
+                    <img src="{% static user_avatar_full_path %}?rand=<%= Date.now() %>" alt="用户头像"
+                        class="rounded-circle" style="width:50px; height:50px;">
+                    {% else %}
+                    <img src="{% static default_avatar_path %}" alt="默认头像" class="rounded-circle"
+                        style="width:50px; height:50px;">
                     {% endif %}
-                </div>
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </a>
+                <span class="ms-1 text-muted">
+                    {{ post.created_by.username }}
+                </span>
             </div>
+        </div>
+        <div class="row" style="margin-left: 47px;">
+            {{ post.get_message_as_markdown }}
+        </div>
+
+        {% if post.is_hidden %}
+            <span class="badge bg-warning text-dark ms-2">已隐藏</span>
         {% endif %}
+
+        {% if forloop.first %}
+        <div class="d-flex justify-content-end mb-2">
+            <!-- 回复按钮 -->
+        </div>
+        {% endif %}
+
+        <!-- 操作按钮，仅管理员可见 -->
+        <div class="d-flex justify-content-end mb-2">
+            {% if request.session.UserInfo.identity == 3 %}
+                <!-- 隐藏或取消隐藏按钮 -->
+                {% if post.is_hidden %}
+                    <a href="{% url 'Forum:unhide_post' post.id %}" class="btn btn-success btn-sm me-2">
+                        <i class="fas fa-eye"></i> 取消隐藏
+                    </a>
+                {% else %}
+                    <a href="{% url 'Forum:hide_post' post.id %}" class="btn btn-warning btn-sm me-2">
+                        <i class="fas fa-eye-slash"></i> 隐藏
+                    </a>
+                {% endif %}
+                <!-- 删除按钮 -->
+                <form method="post" action="{% url 'Forum:delete_post' post.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i> 删除
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
     {% endfor %}
 
     <div class="mt-4">
-        <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i class="fas fa-reply me-1"></i>回复</a>
+        <a href="{% url 'Forum:reply' topic.pk %}" class="btn btn-primary custom-button"><i
+                class="fas fa-reply me-1"></i>回复</a>
     </div>
 </div>
 
