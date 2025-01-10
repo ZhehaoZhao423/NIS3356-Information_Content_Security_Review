@@ -6,14 +6,24 @@ from django.core.paginator import Paginator, EmptyPage
 from django.utils.functional import SimpleLazyObject
 from django.urls import reverse
 from django.utils import timezone
-from django.http import JsonResponse
-from django.db.models import Q, Count, Max
+from django.utils.timezone import localtime
+
+import re
+import os
 from django.conf import settings
 from UserAuth.models import User
-import os
-import re
+from django.http import HttpResponse
+from django.db.models import Q, Count, Max
+from django.http import JsonResponse
 
-# @login_required
+
+# 在 views.py 文件中初始化分类器
+# from .classify_image import ImageClassifier  # 替换为实际文件路径
+from django.conf import settings
+
+# 初始化分类器
+# classifier = ImageClassifier(settings.MODEL_CHECKPOINT_PATH)
+
 # 获取用户头像的帮助函数
 def get_matching_files(request):
     pattern = re.compile(str(request.session['UserInfo'].get("id")) + r'.*')
@@ -26,7 +36,6 @@ def get_matching_files(request):
     if not matching_files:
         matching_files.append('default.jpeg')
     return matching_files[0]
-
 
 # 收件箱视图
 # @login_required
@@ -56,45 +65,50 @@ def inbox(request):
     }
     return render(request, 'PrivateMessage/inbox.html', context)
 
-
 # 发送消息视图
 # @login_required
 def send_message(request):
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            sender = User.objects.get(pk=request.session['UserInfo'].get('id'))
-            recipient_id = request.POST.get('recipient')
-            recipient = User.objects.get(pk=recipient_id)
+    user_info = request.session.get('UserInfo', {})
+    user_id = user_info.get('id')
 
+    # 验证用户登录状态
+    if not user_id:
+        return redirect('login')  # 未登录用户重定向
+
+    current_user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST, request.FILES or None)  # 处理上传文件
+        if form.is_valid():
+            recipient_id = request.POST.get('recipient')
+            recipient = get_object_or_404(User, id=recipient_id)
+
+            # 保存消息
             message = form.save(commit=False)
-            message.sender = sender
+            message.sender = current_user
             message.recipient = recipient
             message.save()
 
-            # 发送消息后重定向回当前对话
-            return redirect(reverse('PrivateMessage:conversation', args=[recipient.id]))
-            # return render(request, 'PrivateMessage/conversation.html')
+            # 发送消息后重定向到对话页面
+            return redirect(reverse('PrivateMessage:conversation_with_user', args=[current_user.id, recipient.id]))
     else:
         form = MessageForm()
 
+    # 获取所有用户列表，包括当前用户
     users = User.objects.all()
 
-    context = {
+    return render(request, 'PrivateMessage/send_message.html', {
         'form': form,
         'users': users,
-    }
-    return render(request, 'PrivateMessage/send_message.html', context)
-
+    })
 
 # 查看消息详情视图
 # @login_required
+
 def view_message(request, message_id):
-    # 获取当前用户的ID
     user_id = request.session['UserInfo'].get('id')
     current_user = User.objects.get(id=user_id)
 
-    # 使用 Q 对象确保用户可以查看自己作为发件人或收件人的消息
     message = get_object_or_404(Message, Q(id=message_id) & (Q(recipient=current_user) | Q(sender=current_user)))
 
     message.is_read = True  # 将消息标记为已读
@@ -102,131 +116,137 @@ def view_message(request, message_id):
 
     context = {
         'message': message,
-        'matching_files': get_matching_files(request),  # 用户头像
+        'matching_files': get_matching_files(request),
     }
     return render(request, 'PrivateMessage/view_message.html', context)
 
-
 # @login_required
 def reply_message(request, message_id):
-    # 获取当前用户的ID
     user_id = request.session['UserInfo'].get('id')
     current_user = User.objects.get(id=user_id)
 
-    # 获取原消息
     original_message = get_object_or_404(Message, id=message_id)
 
     if request.method == 'POST':
-        form = MessageForm(request.POST)
+        form = MessageForm(request.POST, request.FILES)  # 添加 request.FILES
         if form.is_valid():
             reply = form.save(commit=False)
-            reply.sender = current_user  # 当前登录用户作为发件人
-            reply.recipient = original_message.sender  # 原消息的发件人作为收件人
+            reply.sender = current_user
+            reply.recipient = original_message.sender
             reply.save()
 
-            return redirect('PrivateMessage:inbox')  # 回复成功后返回收件箱
+            return redirect('PrivateMessage:conversation', current_user_id=current_user.id, selected_user_id=original_message.sender.id)
     else:
         form = MessageForm()
 
     context = {
         'form': form,
-        'matching_files': get_matching_files(request),  # 用户头像
-        'original_message': original_message,  # 显示原消息内容
+        'matching_files': get_matching_files(request),
+        'original_message': original_message,
     }
     return render(request, 'PrivateMessage/reply_message.html', context)
 
+# @login_required
 from .forms import MessageForm
 from django.shortcuts import redirect
 
-
-from django.utils import timezone
 # @login_required
+from django.utils import timezone
+
+from django.utils.timezone import localtime
+
 def conversation_view(request, current_user_id, selected_user_id):
-    # 获取当前登录用户对象
+    # 获取当前用户和选定用户
     current_user = get_object_or_404(User, id=current_user_id)
     selected_user = get_object_or_404(User, id=selected_user_id)
 
-    # 标记与选中联系人的所有未读消息为已读
-    Message.objects.filter(sender=selected_user, recipient=current_user, is_read=False).update(is_read=True)
+    # 标记前50条未读消息为已读，避免性能问题
+    # 获取前 50 条未读消息的 ID
+    unread_messages = Message.objects.filter(
+        sender=selected_user, recipient=current_user, is_read=False
+    ).order_by('timestamp')[:50].values_list('id', flat=True)
 
-    # 获取与当前登录用户有过互动的联系人列表
-    contact_users = User.objects.filter(
-        Q(sent_messages__recipient=current_user) | Q(received_messages__sender=current_user)
-    ).annotate(
-        last_message_time=Max('sent_messages__timestamp', filter=Q(sent_messages__recipient=current_user))
-    ).order_by('-last_message_time')
-
-    # 获取每个联系人的未读消息数量
-    contact_users = contact_users.annotate(
-        unread_count=Count('sent_messages', filter=Q(sent_messages__recipient=current_user, sent_messages__is_read=False))
-    )
-
-    # 为每个联系人添加头像路径
-    for contact in contact_users:
-        contact.avatar_url = f"{request.build_absolute_uri('/static/images/')}{contact.id}.jpeg"
-
-    # 获取当前登录用户与选中联系人的所有消息
+    # 批量更新这些消息
+    Message.objects.filter(id__in=unread_messages).update(is_read=True)
+    # 获取与选定用户的最近50条消息
     messages = Message.objects.filter(
         (Q(sender=current_user) & Q(recipient=selected_user)) |
         (Q(sender=selected_user) & Q(recipient=current_user))
-    ).order_by('timestamp')
+    ).order_by('-timestamp')[:50]  # 降序，显示最近的消息
 
-    # 格式化消息中的时间戳为东八区
+    # 格式化时间戳
+    messages_data = []
     for message in messages:
-        message.timestamp = timezone.localtime(message.timestamp, timezone.get_fixed_timezone(480)).strftime('%Y-%m-%d %H:%M:%S')
+        messages_data.append({
+            'sender_id': message.sender.id,
+            'content': message.content,
+            'image_url': request.build_absolute_uri(message.image.url) if message.image else None,
+            'timestamp': localtime(message.timestamp).strftime('%Y-%m-%d %H:%M:%S'),
+        })
 
-    # 消息发送表单
-    form = MessageForm(request.POST or None)
+    # 初始化消息表单
+    form = MessageForm(request.POST or None, request.FILES or None)
     if form.is_valid():
-        message = form.save(commit=False)
-        message.sender = current_user
-        message.recipient = selected_user
-        message.save()
-        # 重新加载页面，避免表单重复提交
+        new_message = form.save(commit=False)
+        new_message.sender = current_user
+        new_message.recipient = selected_user
+        new_message.save()
+
+        # 返回刚发送的消息数据（JSON响应）
+        new_message_data = {
+            'sender_id': new_message.sender.id,
+            'content': new_message.content,
+            'image_url': request.build_absolute_uri(new_message.image.url) if new_message.image else None,
+            'timestamp': localtime(new_message.timestamp).strftime('%Y-%m-%d %H:%M:%S'),
+        }
+
+        # 检查是否为 AJAX 请求
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'new_message': new_message_data})
+
+        # 如果不是 AJAX 请求，重定向
         return redirect('PrivateMessage:conversation_with_user', current_user_id=current_user.id, selected_user_id=selected_user.id)
 
-    # 渲染模板
     return render(request, 'PrivateMessage/conversation.html', {
-        'contact_users': contact_users,  # 所有联系人
-        'messages': messages,  # 消息记录
-        'selected_user': selected_user,  # 当前选中联系人
-        'current_user': current_user,  # 当前登录用户
-        'form': form,  # 消息表单
+        'contact_users': User.objects.exclude(id=current_user.id),
+        'messages': reversed(messages),  # 消息反序显示
+        'selected_user': selected_user,
+        'current_user': current_user,
+        'form': form,
     })
-# @login_required
+
 def fetch_new_messages(request, current_user_id, selected_user_id):
     current_user = get_object_or_404(User, id=current_user_id)
     selected_user = get_object_or_404(User, id=selected_user_id)
 
-    # 获取当前用户和选中的用户之间的所有消息
     messages = Message.objects.filter(
         (Q(sender=current_user) & Q(recipient=selected_user)) |
         (Q(sender=selected_user) & Q(recipient=current_user))
     ).order_by('timestamp')
 
-    # 强制将时间转换为东八区格式，避免轮询时发生时区问题
-    message_data = [
-        {
+    message_data = []
+    for message in messages:
+        # 构建 image_url 并打印路径
+        image_url = request.build_absolute_uri(message.image.url) if message.image else None
+        # print("DEBUG: image_url =", image_url)  # 临时调试输出
+        message_data.append({
             'sender_id': message.sender.id,
             'content': message.content,
-            'timestamp': timezone.localtime(message.timestamp, timezone.get_fixed_timezone(480)).strftime('%Y-%m-%d %H:%M:%S')
-        }
-        for message in messages
-    ]
+            'image_url': image_url,
+            'timestamp': timezone.localtime(message.timestamp).strftime('%Y-%m-%d %H:%M:%S'),
+        })
 
-    # 返回JSON响应
     return JsonResponse({'messages': message_data})
-# @login_required
-def search_user(request): 
-    username = request.GET.get('user_id')
+from django.shortcuts import get_object_or_404, redirect
+from UserAuth.models import User
+
+def search_user(request):
+    # 获取输入的用户ID或用户名
+    username = request.GET.get('user_id')  # 假设通过用户名搜索
     current_user_id = request.session['UserInfo'].get('id')
 
-    try:
-        target_user = User.objects.get(username=username)
-        conversation_url = reverse('PrivateMessage:conversation_with_user', args=[current_user_id, target_user.id])
-        return JsonResponse({
-            "exists": True,
-            "url": conversation_url
-        })
-    except User.DoesNotExist:
-        return JsonResponse({"exists": False})
+    # 查找目标用户
+    target_user = get_object_or_404(User, username=username)  # 根据用户名查找用户
+
+    # 使用 redirect 跳转到 conversation_view
+    return redirect('PrivateMessage:conversation_with_user', current_user_id=current_user_id, selected_user_id=target_user.id)
